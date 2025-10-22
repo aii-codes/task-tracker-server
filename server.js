@@ -12,7 +12,9 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://task-tracker-client.vercel.app",
   "https://task-tracker-client-mm41l9r2t-aii-codes-projects.vercel.app",
+  "https://task-tracker-client-r31l3rk6l-aii-codes-projects.vercel.app", // new deploy
 ];
+
 
 app.use(
   cors({
