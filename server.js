@@ -15,29 +15,28 @@ app.use(
       try {
         const hostname = new URL(origin).hostname;
         if (hostname.endsWith("vercel.app") || hostname.includes("localhost")) {
-          return callback(null, true); // allow all Vercel previews + localhost
+          return callback(null, true); // ✅ allow all Vercel previews + localhost
         }
       } catch (err) {
         return callback(new Error("Invalid origin"));
       }
       return callback(new Error("Not allowed by CORS"));
     },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // ✅ important for cookies/JWT in headers
   })
 );
 
-// ✅ Handle preflight requests explicitly
-app.use((req, res, next) => {
+// Explicit preflight handler
+app.options("*", (req, res) => {
   if (req.headers.origin) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
   }
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
+  return res.sendStatus(200);
 });
 
 // ✅ Parse incoming JSON requests
