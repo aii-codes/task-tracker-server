@@ -7,7 +7,7 @@ const taskRoutes = require("./src/routes/taskRoutes");
 
 const app = express();
 
-// ✅ CORS should always be the first middleware
+// ✅ CORS middleware first
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -15,7 +15,7 @@ app.use(
       try {
         const hostname = new URL(origin).hostname;
         if (hostname.endsWith("vercel.app") || hostname.includes("localhost")) {
-          return callback(null, true); // ✅ allow all Vercel previews + localhost
+          return callback(null, true); // allow all Vercel previews + localhost
         }
       } catch (err) {
         return callback(new Error("Invalid origin"));
@@ -28,6 +28,7 @@ app.use(
   })
 );
 
+// ✅ Express 5-safe preflight handler
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     if (req.headers.origin) {
@@ -41,16 +42,15 @@ app.use((req, res, next) => {
   next();
 });
 
-
-// ✅ Parse incoming JSON requests
+// ✅ Parse JSON
 app.use(express.json());
 
-// Root test route
+// Root route
 app.get("/", (req, res) => {
   res.send("✅ Task Tracker Backend running with proper CORS!");
 });
 
-// API routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 
