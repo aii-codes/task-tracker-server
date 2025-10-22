@@ -10,12 +10,8 @@ console.log('✅ authRoutes loaded:', authRoutes);
 const app = express();
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // for local dev
-      "https://task-tracker-client.vercel.app", // your deployed frontend
-    ],
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
   })
 );
 app.use(express.json()); // lets backend read JSON data
