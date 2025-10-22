@@ -1,27 +1,25 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-const pool = require('./src/db');
-const authRoutes = require('./src/routes/authRoutes');
-const taskRoutes = require('./src/routes/taskRoutes');
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const pool = require("./src/db");
+const authRoutes = require("./src/routes/authRoutes");
+const taskRoutes = require("./src/routes/taskRoutes");
 
 const app = express();
 
-// ✅ CORS configuration compatible with Express 5 / Node 22
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://task-tracker-client.vercel.app",
-  "https://task-tracker-client-mm41l9r2t-aii-codes-projects.vercel.app",
-  "https://task-tracker-client-r31l3rk6l-aii-codes-projects.vercel.app", // new deploy
-];
-
-
+// 🧩 UNIVERSAL, FUTURE-PROOF CORS CONFIG
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., mobile apps, curl)
+      // allow server-to-server or curl calls with no origin
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // allow all your Vercel preview URLs and local dev
+      if (
+        origin.endsWith(".vercel.app") ||
+        origin.includes("localhost")
+      ) {
+        return callback(null, true);
+      }
       return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -30,7 +28,7 @@ app.use(
   })
 );
 
-// ✅ Handle preflight requests manually (Express 5 safe)
+// ✅ handle preflight OPTIONS requests explicitly
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header(
@@ -41,22 +39,25 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization"
   );
-  if (req.method === "OPTIONS") return res.sendStatus(200);
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
   next();
 });
 
+// parse JSON body
 app.use(express.json());
 
-// Root route
+// simple root test route
 app.get("/", (req, res) => {
-  res.send("✅ Task Tracker Backend is running with CORS configured correctly!");
+  res.send("✅ Task Tracker Backend is running with working CORS!");
 });
 
-// Routes
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 
-// Server start
+// start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
