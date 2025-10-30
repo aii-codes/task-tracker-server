@@ -5,7 +5,7 @@ const { addTask, getTasks, editTask, removeTask } = require('../controllers/task
 // CRUD routes
 router.post('/', addTask);         // Create
 router.get('/', getTasks);         // Read
-router.put('/', editTask);         // Update
+router.put('/:id', editTask);      // ✅ Update (fix here)
 router.delete('/:id', removeTask); // Delete
 
 module.exports = router;

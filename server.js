@@ -7,19 +7,24 @@ const taskRoutes = require("./src/routes/taskRoutes");
 
 const app = express();
 
-// ✅ CORS middleware first
+// ✅ Allow both localhost & Vercel
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://task-tracker-frontend.vercel.app",
+];
+
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow server-to-server or curl
-      try {
-        const hostname = new URL(origin).hostname;
-        if (hostname.endsWith("vercel.app") || hostname.includes("localhost")) {
-          return callback(null, true); // allow all Vercel previews + localhost
-        }
-      } catch (err) {
-        return callback(new Error("Invalid origin"));
+      // Allow server-to-server and no-origin requests (e.g. Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -28,12 +33,10 @@ app.use(
   })
 );
 
-// ✅ Express 5-safe preflight handler
+// ✅ Handle preflight requests (Express 5 safe)
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
-    if (req.headers.origin) {
-      res.header("Access-Control-Allow-Origin", req.headers.origin);
-    }
+    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.header("Access-Control-Allow-Credentials", "true");
@@ -45,15 +48,15 @@ app.use((req, res, next) => {
 // ✅ Parse JSON
 app.use(express.json());
 
-// Root route
+// ✅ Root route
 app.get("/", (req, res) => {
-  res.send("✅ Task Tracker Backend running with proper CORS!");
+  res.send("✅ Task Tracker Backend running with full CORS support!");
 });
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ✅ Start server on port 5000 (for local testing)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

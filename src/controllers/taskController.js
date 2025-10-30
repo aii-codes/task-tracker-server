@@ -10,6 +10,7 @@ const getUserIdFromToken = (req) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return decoded.userId;
   } catch (err) {
+    console.error('JWT verification failed:', err);
     return null;
   }
 };
@@ -48,15 +49,18 @@ const editTask = async (req, res) => {
   const userId = getUserIdFromToken(req);
   if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-  const { id, title, description, priority, completed, due_date } = req.body;
+  const { id } = req.params; // ✅ from URL now
+  const { title, description, priority, completed, due_date, status } = req.body; // ✅ add status
+
   try {
-    const updated = await updateTask(id, title, description, priority, completed, due_date);
+    const updated = await updateTask(id, title, description, priority, completed, due_date, status);
     res.json(updated);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Delete a task
 const removeTask = async (req, res) => {
