@@ -32,11 +32,3 @@ Handles authentication, CRUD operations, PostgreSQL database queries, and produc
 ## 🚀 Live API
 
 👉 **https://task-tracker-backend-8yob.onrender.com**
-
----
-
-## 📦 Run Locally
-
-```bash
-npm install
-npm run dev
